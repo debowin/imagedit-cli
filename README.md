@@ -143,13 +143,13 @@ Image Executable File [here](https://raw.githubusercontent.com/debowin/imagedit-
 
 ### Blur
 
-|  Original          |  Blurred (2)          | 
+|  Original          |  Blurred (7)          | 
 |:-------------------------:|:-------------------------:|
 |![](sample/fruitsplus.jpg) | ![](output/blurry.png)  |
 
 ### Sharpen
 
-|  Original          |  Sharpened (2)          | 
+|  Original          |  Sharpened (11)          | 
 |:-------------------------:|:-------------------------:|
 |![](sample/fruitsplus.jpg) | ![](output/sharpy.png)  |
 
