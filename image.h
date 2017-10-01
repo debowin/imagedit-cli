@@ -20,14 +20,14 @@
  * constants
  **/
 enum {
-    IMAGE_SAMPLING_POINT=1,
+    IMAGE_SAMPLING_POINT,
     IMAGE_SAMPLING_BILINEAR,
     IMAGE_SAMPLING_GAUSSIAN,
     IMAGE_N_SAMPLING_METHODS
 };
 
 enum {
-    IMAGE_CHANNEL_RED=1,
+    IMAGE_CHANNEL_RED,
     IMAGE_CHANNEL_GREEN,
     IMAGE_CHANNEL_BLUE,
     IMAGE_CHANNEL_ALPHA,
@@ -42,26 +42,26 @@ class Image
 {
 public:
     union PixelData{
-       Pixel *pixels;
-       uint8_t *raw;
+        Pixel *pixels;
+        uint8_t *raw;
     };
-    
+
     PixelData data;
     //PixelInfo *pixels; //pixel array
     //uint8_t *pixelData;
     int width, height, num_pixels;
     int sampling_method;
-	//BMP* bmpImg;
+    //BMP* bmpImg;
 
 public:
     // Creates a blank image with the given dimensions
     Image (int width, int height);
 
-    // Copy image
+    // Copy iamage
     Image (const Image& src);
 
-	// Make image from file
-	Image(char *fname);
+    // Make image from file
+    Image(char *fname);
 
     // Destructor
     ~Image ();
@@ -76,8 +76,8 @@ public:
     int Height    () const { return height; }
     int NumPixels () const { return num_pixels; }
 
-	// Make file from image
-	void Write( char *fname );
+    // Make file from image
+    void Write( char *fname );
 
     // Adds noise to an image.  The amount of noise is given by the factor
     // in the range [0.0..1.0].  0.0 adds no noise.  1.0 adds a lot of noise.
@@ -89,7 +89,7 @@ public:
     /**
      * Changes the contrast of an image by interpolating between the image
      * and a constant gray image with the average luminance.
-     * Interpolation reduces contrast, extrapolation boosts contrast,
+     * Interpolation reduces constrast, extrapolation boosts constrast,
      * and negative factors generate inverted images.
      **/
     void ChangeContrast (double factor);
@@ -98,7 +98,7 @@ public:
      * Changes the saturation of an image by interpolating between the
      * image and a gray level version of the image.  Interpolation
      * decreases saturation, extrapolation increases it, negative factors
-     * preserve luminance but invert the hue of the input image.
+     * presrve luminance but invert the hue of the input image.
      **/
     void ChangeSaturation (double factor);
 
@@ -125,7 +125,7 @@ public:
     // Blurs an image with an n x n Gaussian filter.
     void Blur(int n);
 
-	// Sharpens an image by blurring with an n x n Gaussian filter and then extrapolating
+    // Sharpens an image by blurring with an n x n Gaussian filter and then extrapolating
     void Sharpen(int n);
 
     // Detects edges in an image.
@@ -150,19 +150,13 @@ public:
     Image* Rotate(double angle);
 
     // Warps an image using a creative filter of your choice.
-    Image* Fun(double twistFactor);
+    void Fun();
 
     // Sets the sampling method.
     void SetSamplingMethod(int method);
 
     // Sample image using current sampling method.
     Pixel Sample(double u, double v);
-
-    Pixel NearestNeighborSampling(double u, double v);
-
-    Pixel BilinearSampling(double u, double v);
-
-    Pixel GaussianSampling(double u, double v, int r);
 };
 
 #endif

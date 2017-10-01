@@ -57,7 +57,7 @@ Usage: image -input <filename> [-option [arg ...] ...] -output <filename>
 -FloydSteinbergDither <nbits>
 -scale <sx> <sy>
 -rotate <angle>
--fun <twistFactor>
+-fun
 -sampling <method no>
 ```
 
@@ -72,7 +72,12 @@ multiple	times,	to	save	out	intermediate	results:
 
 ```image -input in.bmp -blur 5 -output blurred.bmp -edgeDetect -output edges.bmp -rotate 30 -output allCombined.bmp```
 
-### Download Source Code [here](https://github.com/debowin/imagedit-cli/zipball/master/).
+### Download
+Source Code Zip [here](https://github.com/debowin/imagedit-cli/zipball/master/).
+
+Image CPP File [here](https://raw.githubusercontent.com/debowin/imagedit-cli/master/image.cpp).
+
+Image Executable File [here](https://raw.githubusercontent.com/debowin/imagedit-cli/master/image).
 
 ## Features
 
@@ -102,9 +107,9 @@ multiple	times,	to	save	out	intermediate	results:
 
 ### Extract Channel
 
-|  Original          |  Extract Green (2)          | 
+|  Original          |  Extract Green (1)          |
 |:-------------------------:|:-------------------------:|
-|![](sample/fruitsplus.jpg) | ![](output/extract_red.png)  |
+|![](sample/fruitsplus.jpg) | ![](output/extract_green.png)  |
 
 ### Crop
 
@@ -112,7 +117,7 @@ multiple	times,	to	save	out	intermediate	results:
 |:-------------------------:|:-------------------------:|
 |![](sample/fruitsplus.jpg) | ![](output/crop.png)  |
 
-### Quanitze
+### Quantize
 
 |  Original          |  Quantize (2)          | 
 |:-------------------------:|:-------------------------:|
@@ -162,7 +167,7 @@ multiple	times,	to	save	out	intermediate	results:
 
 ### Nearest Neighbour Sampling with Scale Down
 
-|  Original          |  Sampling (1) | 
+|  Original          |  Sampling (0) |
 |:-------------------------:|:-------------------------:|
 |![](sample/fruitsplus.jpg) | ![](output/scaled_down.png)  | 
 
@@ -170,7 +175,7 @@ multiple	times,	to	save	out	intermediate	results:
 
 ### Bilinear Interpolation Sampling with Scale Down
 
-|  Original          |  Sampling (2) | 
+|  Original          |  Sampling (1) |
 |:-------------------------:|:-------------------------:|
 |![](sample/fruitsplus.jpg) | ![](output/scaled_down_bilinear.png)  |
 
@@ -178,7 +183,7 @@ multiple	times,	to	save	out	intermediate	results:
 
 ### Gaussian Sampling with Scale Down
 
-|  Original          |  Sampling (3)   | 
+|  Original          |  Sampling (2)   |
 |:-------------------------:|:-------------------------:|
 |![](sample/fruitsplus.jpg) | ![](output/scaled_down_gaussian.png)  |
 
@@ -192,7 +197,7 @@ multiple	times,	to	save	out	intermediate	results:
 
 ### Swirl with Gaussian Sampling
 
-|  Original          |  Swirl (128)   |
+|  Original          |  Swirl   |
 |:-------------------------:|:-------------------------:|
 |![](sample/fruitsplus.jpg) | ![](output/swirly.png)  |
 
@@ -203,4 +208,4 @@ multiple	times,	to	save	out	intermediate	results:
 |![](sample/fruitsplus.jpg) | ![](output/allCombined.png)  |
 
 
-```image -input fruitsplus.jpg -blur 5 -contrast 1.5 -sampling 3 -rotate 30 -fun 48 -randomDither 2 -output allCombined.png```
+```image -input fruitsplus.jpg -blur 5 -contrast 1.5 -sampling 2 -rotate 30 -fun -randomDither 2 -output allCombined.png```

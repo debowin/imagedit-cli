@@ -61,7 +61,7 @@ Pixel PixelRandom (void);
 // Component-wise addition of pixels.
 Pixel operator+ (const Pixel& p, const Pixel& q);
 
-    // Component-wise multiplication of pixels.
+// Component-wise multiplication of pixels.
 Pixel operator* (const Pixel& p, const Pixel& q);
 
 // Component-wise multiplication of pixel by scalar.

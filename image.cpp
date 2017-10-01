@@ -24,7 +24,7 @@ double *GaussianKernel(int n) {
 }
 
 double GaussianValue2D(double x, double y, double sigma_squared) {
-    return 1 / (2 * M_PI * sigma_squared) * exp(-(pow(x, 2) + pow(y, 2))/ (2 * sigma_squared));
+    return 1 / (2 * M_PI * sigma_squared) * exp(-(pow(x, 2) + pow(y, 2)) / (2 * sigma_squared));
 }
 
 /**
@@ -127,6 +127,8 @@ void Image::Brighten(double factor) {
         for (y = 0; y < Height(); y++) {
             Pixel p = GetPixel(x, y);
             Pixel scaled_p = p * factor;
+            // Reset alpha value to prevent transparency,
+            scaled_p.a = p.a;
             GetPixel(x, y) = scaled_p;
         }
     }
@@ -439,9 +441,9 @@ void Image::EdgeDetect() {
 
 Image *Image::Scale(double sx, double sy) {
     /* WORK HERE DONE */
-    auto *scaledImage = new Image((int)(Width() * sx), (int)(Height() * sy));
-    for(int y = 0; y < scaledImage->Height(); y++){
-        for(int x = 0; x < scaledImage->Width(); x++){
+    auto *scaledImage = new Image((int) (Width() * sx), (int) (Height() * sy));
+    for (int y = 0; y < scaledImage->Height(); y++) {
+        for (int x = 0; x < scaledImage->Width(); x++) {
             double u = x / sx;
             double v = y / sy;
             scaledImage->SetPixel(x, y, Sample(u, v));
@@ -452,33 +454,34 @@ Image *Image::Scale(double sx, double sy) {
 
 Image *Image::Rotate(double angle) {
     /* WORK HERE DONE */
-    double angleRadians = angle*M_PI/180;
+    double angleRadians = angle * M_PI / 180;
     auto *rotatedImage = new Image(Width(), Height());
-    for(int y = 0; y < rotatedImage->Height(); y++){
-        for(int x = 0; x < rotatedImage->Width(); x++){
-            double u = (x-Width()/2)*cos(angleRadians) - (y-Height()/2)*sin(angleRadians)+Width()/2;
-            double v = (x-Width()/2)*sin(angleRadians) + (y-Height()/2)*cos(angleRadians)+Height()/2;
+    for (int y = 0; y < rotatedImage->Height(); y++) {
+        for (int x = 0; x < rotatedImage->Width(); x++) {
+            double u = (x - Width() / 2) * cos(angleRadians) - (y - Height() / 2) * sin(angleRadians) + Width() / 2;
+            double v = (x - Width() / 2) * sin(angleRadians) + (y - Height() / 2) * cos(angleRadians) + Height() / 2;
             rotatedImage->SetPixel(x, y, Sample(u, v));
         }
     }
     return rotatedImage;
 }
 
-Image* Image::Fun(double twistFactor) {
+void Image::Fun() {
     /* WORK HERE DONE */
     // Swirl Transform
     auto *twistedImage = new Image(Width(), Height());
-    for(int y = 0; y < twistedImage->Height(); y++){
-        for(int x = 0; x < twistedImage->Width(); x++){
-            double angleRadians = twistFactor*M_PI/sqrt(pow(x-Width()/2, 2) + pow(y-Height()/2, 2)+0.0001);
-            double u = (x-Width()/2)*cos(angleRadians) - (y-Height()/2)*sin(angleRadians)+Width()/2;
-            double v = (x-Width()/2)*sin(angleRadians) + (y-Height()/2)*cos(angleRadians)+Height()/2;
-            if(__isnan(u))
-                printf("%lf %lf\n", u, v);
+    double twistFactor = 96.0;
+    for (int y = 0; y < twistedImage->Height(); y++) {
+        for (int x = 0; x < twistedImage->Width(); x++) {
+            double angleRadians =
+                    twistFactor * M_PI / sqrt(pow(x - Width() / 2, 2) + pow(y - Height() / 2, 2) + 0.0001);
+            double u = (x - Width() / 2) * cos(angleRadians) - (y - Height() / 2) * sin(angleRadians) + Width() / 2;
+            double v = (x - Width() / 2) * sin(angleRadians) + (y - Height() / 2) * cos(angleRadians) + Height() / 2;
             twistedImage->SetPixel(x, y, Sample(u, v));
         }
     }
-    return twistedImage;
+
+    memcpy(data.raw, twistedImage->data.raw, (size_t) num_pixels * 4);
 
     // Wave Transform
 //    auto *wavyImage = new Image(Width(), Height());
@@ -489,7 +492,8 @@ Image* Image::Fun(double twistFactor) {
 //            wavyImage->SetPixel(x, y, Sample(u, v));
 //        }
 //    }
-//    return wavyImage;
+//    memcpy(data.raw, twistedImage->data.raw, (size_t) num_pixels * 4);
+
 }
 
 /**
@@ -503,52 +507,43 @@ void Image::SetSamplingMethod(int method) {
 
 Pixel Image::Sample(double u, double v) {
     /* WORK HERE DONE */
-    if(u >= Width() || u < 0 || v >= Height() || v < 0)
+    if (u >= Width() || u < 0 || v >= Height() || v < 0)
         return {};
-    switch(sampling_method) {
+    switch (sampling_method) {
         case IMAGE_SAMPLING_POINT:
-            return NearestNeighborSampling(u, v);
-        case IMAGE_SAMPLING_BILINEAR:
-            return BilinearSampling(u, v);
-        case IMAGE_SAMPLING_GAUSSIAN:
-            return GaussianSampling(u, v, 7);
-        default:
-            return NearestNeighborSampling(u, v);
-    }
-}
+            return GetPixel((int) u, (int) v);
+        case IMAGE_SAMPLING_BILINEAR: {
+            double floorU = floor(u) < Width() ? floor(u) : floor(u - 1);
+            double ceilU = ceil(u) < Width() ? ceil(u) : ceil(u - 1);
+            double floorV = floor(v) < Height() ? floor(v) : floor(v - 1);
+            double ceilV = ceil(v) < Height() ? ceil(v) : ceil(v - 1);
 
-Pixel Image::NearestNeighborSampling(double u, double v) {
-    return GetPixel((int)u, (int)v);
-}
-
-Pixel Image::BilinearSampling(double u, double v) {
-    double floorU = floor(u)<Width()?floor(u):floor(u-1);
-    double ceilU = ceil(u)<Width()?ceil(u):ceil(u-1);
-    double floorV = floor(v)<Height()?floor(v):floor(v-1);
-    double ceilV = ceil(v)<Height()?ceil(v):ceil(v-1);
-
-    // linearly interpolate across upper two pixel choices
-    Pixel upperInterpolation = PixelLerp(GetPixel((int)floorU, (int)floorV),
-                                         GetPixel((int)ceilU, (int)floorV),
-                                         u-floorU);
-    // linearly interpolate across lower two pixel choices
-    Pixel lowerInterpolation = PixelLerp(GetPixel((int)floorU, (int)ceilV),
-                                         GetPixel((int)ceilU, (int)ceilV),
-                                         u-floorU);
-    // linearly interpolate across upper and lower linear interpolations.
-    return PixelLerp(upperInterpolation, lowerInterpolation, v-floorV);
-}
-
-Pixel Image::GaussianSampling(double u, double v, int r) {
-    Pixel newPixel = Pixel();
-    // Convolve across X and Y
-    for(auto x=(int)ceil(u - r / 2); x <= (int)floor(u + r / 2); x++){
-        for(auto y=(int)ceil(v - r / 2); y <= (int)floor(v + r / 2); y++){
-            if(x >=Width() || x < 0 || y >= Height() || y < 0)
-                continue;
-            newPixel = newPixel +
-                    GetPixel(x, y) * GaussianValue2D(fabs(x-u), fabs(y-v), 1);
+            // linearly interpolate across upper two pixel choices
+            Pixel upperInterpolation = PixelLerp(GetPixel((int) floorU, (int) floorV),
+                                                 GetPixel((int) ceilU, (int) floorV),
+                                                 u - floorU);
+            // linearly interpolate across lower two pixel choices
+            Pixel lowerInterpolation = PixelLerp(GetPixel((int) floorU, (int) ceilV),
+                                                 GetPixel((int) ceilU, (int) ceilV),
+                                                 u - floorU);
+            // linearly interpolate across upper and lower linear interpolations.
+            return PixelLerp(upperInterpolation, lowerInterpolation, v - floorV);
         }
+        case IMAGE_SAMPLING_GAUSSIAN: {
+            Pixel newPixel = Pixel();
+            int r = 7;
+            // Convolve across X and Y
+            for (auto x = (int) ceil(u - r / 2); x <= (int) floor(u + r / 2); x++) {
+                for (auto y = (int) ceil(v - r / 2); y <= (int) floor(v + r / 2); y++) {
+                    if (x >= Width() || x < 0 || y >= Height() || y < 0)
+                        continue;
+                    newPixel = newPixel +
+                               GetPixel(x, y) * GaussianValue2D(fabs(x - u), fabs(y - v), 1);
+                }
+            }
+            return newPixel;
+        }
+        default:
+            return GetPixel((int) u, (int) v);
     }
-    return newPixel;
 }
