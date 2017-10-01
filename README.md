@@ -164,6 +164,7 @@ multiple	times,	to	save	out	intermediate	results:
 |  Original          |  Sampling (1) | 
 |:-------------------------:|:-------------------------:|
 |![](sample/fruitsplus.jpg) | ![](output/scaled_down.png)  | 
+
 > with Scale (0.25 0.40)
 
 ### Bilinear Interpolation Sampling with Scale Down
@@ -171,6 +172,7 @@ multiple	times,	to	save	out	intermediate	results:
 |  Original          |  Sampling (2) | 
 |:-------------------------:|:-------------------------:|
 |![](sample/fruitsplus.jpg) | ![](output/scaled_down_bilinear.png)  |
+
 > with Scale (0.25 0.40)
 
 ### Gaussian Sampling with Scale Down
@@ -178,6 +180,7 @@ multiple	times,	to	save	out	intermediate	results:
 |  Original          |  Sampling (3)   | 
 |:-------------------------:|:-------------------------:|
 |![](sample/fruitsplus.jpg) | ![](output/scaled_down_gaussian.png)  |
+
 > with Scale (0.25 0.40)
 
 ### Rotate with Gaussian Sampling
