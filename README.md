@@ -19,7 +19,7 @@ you	use	must	be	one	of	the	supported	formats	(.bmp,	.jpg/.jpeg,	.png,	.tga).
 |:-------------------------:|:-------------------------:|
 |![](sample/sharingan.jpg) | ![](output/kamui.png)  |
 
-## How	the	Program	Works:
+## How	the	Program	Works
 
 The	program	runs	on	the	command	line	and
 performs	operation	in	the	order	that	they	appear	in	the	arguments.	For	example,	to
@@ -208,4 +208,35 @@ Image Executable File [here](https://raw.githubusercontent.com/debowin/imagedit-
 |![](sample/fruitsplus.jpg) | ![](output/allCombined.png)  |
 
 
+
 ```image -input fruitsplus.jpg -blur 5 -contrast 1.5 -sampling 2 -rotate 30 -fun -randomDither 2 -output allCombined.png```
+
+## Challenges
+
+* **Random Dither** - I wasn't sure how to apply it for arbitrary bit depth so I broke the current bit depth into Most Significant and Least Significant
+portions and generated a random number between 0 and the LSB's maximum value. Then I checked if this number was less than or greater than the Least Significant portion.
+If it was lesser, I increased the value of the Most Significant portion by one to retain in my new bit depth representation.
+
+* **Quantization** - Taking remainders and quotients the regular way was making the code look dirty and unintelligible so I moved to
+bit-wise arithmetic for rounding operations.
+
+* **Brightness Reduction** - Had to reset the alpha value to pixel's original value because pixel arithmetic in case of a <1 factor was reducing it, leading to a translucent image.
+
+* **Random Noise** - In this case, I used a Noise Pixel with random values between -256 and 256 instead of 0 to 256 so that the noisy image doesn't become too bright.
+
+* **Blur** - I created a generic Gaussian1D kernel creator function that can be used to create a kernel of any size.
+I also used a variable sigma = size/2 to make the blurring even smoother for higher values of n. I used this to apply blurring two times, once for each dimension.
+
+* **Edge Detection** - Read about the Sobel Filter that has impressive edge detection. Used a 3x3 Sobel Filter after darkening the image and scaling it down and back up
+for being able to detect larger and darker edges. (more prominent ones)
+
+* **Rotation** -  Was unable to get it to rotate it in place till I realized that I needed to add the center coordinates to each pixel's old coordinates(u, v) when we were inverse mapping.
+
+* **Fun** - Realizing the trick about rotation got me thinking towards a differential spinning warp. So I came up with two approaches to rotate pixels differently.
+One twists them more the farther from the center they are, and one that does the opposite. Finally, I decided to go with the latter for which I had to take care of the division by zero
+in case of the middle pixel i.e radius = 0 by adding a tiny value to the square-root. I also had to do a memcpy to copy my result Image to the original Image since
+I was forced by the header file to use a void return type for the fun function and we were only allowed to change the image.cpp file.
+
+* **Sampling** - For bilinear interpolation, it took me some time to arrive at the idea of chaining the interpolations for the upper and lower neighboring pixels.
+For Gaussian sampling, I realized I couldn't use a kernel after repeated failures of trying to do so. To this end, I wrote a utility function that gives the value
+of the gaussian term for any x and y and sigma and used it for convolution.
