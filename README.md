@@ -9,11 +9,13 @@ you	use	must	be	one	of	the	supported	formats	(.bmp,	.jpg/.jpeg,	.png,	.tga).
 
 ### [Mangekyō Sharingan](http://naruto.wikia.com/wiki/Mangeky%C5%8D_Sharingan)
 |  Original Mangekyō Sharingan         |  Mangekyō Sharingan++          | 
+
 |:-------------------------:|:-------------------------:|
 |![](sample/sharingan2.jpg) | ![](output/kamui2.png)  |
 
 ### [Kamui](http://naruto.wikia.com/wiki/Kamui)
 |  Original          |  Kamui          | 
+
 |:-------------------------:|:-------------------------:|
 |![](sample/sharingan.jpg) | ![](output/kamui.png)  |
 
