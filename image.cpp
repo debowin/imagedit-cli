@@ -137,9 +137,17 @@ void Image::Brighten(double factor) {
 
 void Image::ChangeContrast(double factor) {
     /* WORK HERE DONE*/
+    int averageLuminance = 0;
     for (int x = 0; x < Width(); x++) {
         for (int y = 0; y < Height(); y++) {
-            Pixel grayPixel = Pixel(127, 127, 127);
+            averageLuminance += GetPixel(x, y).Luminance();
+        }
+    }
+    averageLuminance /= (Width()*Height());
+    Pixel grayPixel = Pixel((Component)averageLuminance, (Component)averageLuminance, (Component)averageLuminance);
+
+    for (int x = 0; x < Width(); x++) {
+        for (int y = 0; y < Height(); y++) {
             Pixel originalPixel = GetPixel(x, y);
             GetPixel(x, y) = PixelLerp(grayPixel, originalPixel, factor);
         }
@@ -207,9 +215,6 @@ void Image::Quantize(int nbits) {
     for (int x = 0; x < Width(); x++) {
         for (int y = 0; y < Height(); y++) {
             Pixel quantPixel = GetPixel(x, y);
-//            printf("%d became %d\t", quantPixel.r, (quantPixel.r >> (8 - nbits)) << (8 - nbits));
-//            printf("%d became %d\t", quantPixel.g, (quantPixel.g >> (8 - nbits)) << (8 - nbits));
-//            printf("%d became %d\n", quantPixel.b, (quantPixel.b >> (8 - nbits)) << (8 - nbits));
             quantPixel.SetClamp((quantPixel.r >> (8 - nbits)) << (8 - nbits),
                                 (quantPixel.g >> (8 - nbits)) << (8 - nbits),
                                 (quantPixel.b >> (8 - nbits)) << (8 - nbits));
@@ -234,13 +239,6 @@ void Image::RandomDither(int nbits) {
             int redLeastSignificant = ditheredPixel.r & ((1 << (8 - nbits)) - 1);
             int greenLeastSignificant = ditheredPixel.g & ((1 << (8 - nbits)) - 1);
             int blueLeastSignificant = ditheredPixel.b & ((1 << (8 - nbits)) - 1);
-
-//            printf("%d became %d\t", ditheredPixel.r,
-//                   (redMostSignificant + noise < redLeastSignificant ? 1 : 0) << (8 - nbits));
-//            printf("%d became %d\t", ditheredPixel.g,
-//                   (greenMostSignificant + noise < greenLeastSignificant ? 1 : 0) << (8 - nbits));
-//            printf("%d became %d\n", ditheredPixel.b,
-//                   (blueMostSignificant + noise < blueLeastSignificant ? 1 : 0) << (8 - nbits));
 
             ditheredPixel.SetClamp((redMostSignificant + (noise < redLeastSignificant ? 1 : 0)) << (8 - nbits),
                                    (greenMostSignificant + (noise < greenLeastSignificant ? 1 : 0)) << (8 - nbits),
@@ -274,21 +272,14 @@ void Image::OrderedDither(int nbits) {
             int greenMostSignificant = ditheredPixel.g >> (8 - nbits);
             int blueMostSignificant = ditheredPixel.b >> (8 - nbits);
 
-            int redError = ditheredPixel.r - redMostSignificant;
-            int greenError = ditheredPixel.g - greenMostSignificant;
-            int blueError = ditheredPixel.b - blueMostSignificant;
-
-//            printf("%d became %d\t", ditheredPixel.r,
-//                   (redMostSignificant + (redError > (8-nbits)*Bayer4[i][j] ? 1 : 0)) << (8 - nbits));
-//            printf("%d became %d\t", ditheredPixel.g,
-//                   (greenMostSignificant + (greenError > (8-nbits)*Bayer4[i][j] ? 1 : 0)) << (8 - nbits));
-//            printf("%d became %d\n", ditheredPixel.b,
-//                   (blueMostSignificant + (blueError > (8-nbits)*Bayer4[i][j] ? 1 : 0)) << (8 - nbits));
+            int redError = ditheredPixel.r - (redMostSignificant<<(8-nbits));
+            int greenError = ditheredPixel.g - (greenMostSignificant<<(8-nbits));
+            int blueError = ditheredPixel.b - (blueMostSignificant<<(8-nbits));
 
             ditheredPixel.SetClamp(
-                    (redMostSignificant + (redError > (8 - nbits) * Bayer4[i][j] ? 1 : 0)) << (8 - nbits),
-                    (greenMostSignificant + (greenError > (8 - nbits) * Bayer4[i][j] ? 1 : 0)) << (8 - nbits),
-                    (blueMostSignificant + (blueError > (8 - nbits) * Bayer4[i][j] ? 1 : 0)) << (8 - nbits));
+                    (redMostSignificant + (redError > pow(2, 8 - nbits - 4) * Bayer4[i][j] ? 1 : 0)) << (8 - nbits),
+                    (greenMostSignificant + (greenError > pow(2, 8 - nbits - 4) * Bayer4[i][j] ? 1 : 0)) << (8 - nbits),
+                    (blueMostSignificant + (blueError > pow(2, 8 - nbits - 4) * Bayer4[i][j] ? 1 : 0)) << (8 - nbits));
             GetPixel(x, y) = ditheredPixel;
         }
     }
@@ -311,9 +302,6 @@ void Image::FloydSteinbergDither(int nbits) {
             int newRed = (ditheredPixel.r >> (8 - nbits)) << (8 - nbits);
             int newGreen = (ditheredPixel.g >> (8 - nbits)) << (8 - nbits);
             int newBlue = (ditheredPixel.b >> (8 - nbits)) << (8 - nbits);
-//            printf("%d became %d\t", ditheredPixel.r, newRed);
-//            printf("%d became %d\t", ditheredPixel.g, newGreen);
-//            printf("%d became %d\n", ditheredPixel.b, newBlue);
             Pixel errorPixel = Pixel((unsigned char) (ditheredPixel.r - newRed),
                                      (unsigned char) (ditheredPixel.g - newGreen),
                                      (unsigned char) (ditheredPixel.b - newBlue));

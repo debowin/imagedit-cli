@@ -12,4 +12,7 @@ set(SOURCE_FILES
         stb_image.h
         stb_image_write.h)
 
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
+
 add_executable(image ${SOURCE_FILES})
