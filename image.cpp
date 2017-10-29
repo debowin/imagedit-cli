@@ -152,10 +152,7 @@ void Image::ChangeSaturation(double factor) {
     for (int x = 0; x < Width(); x++) {
         for (int y = 0; y < Height(); y++) {
             Pixel originalPixel = GetPixel(x, y);
-            Pixel grayPixel = Pixel(
-                    (unsigned char) (0.2126f * originalPixel.r + 0.7512f * originalPixel.g + 0.0722 * originalPixel.b),
-                    (unsigned char) (0.2126f * originalPixel.r + 0.7512f * originalPixel.g + 0.0722 * originalPixel.b),
-                    (unsigned char) (0.2126f * originalPixel.r + 0.7512f * originalPixel.g + 0.0722 * originalPixel.b));
+            Pixel grayPixel = Pixel(originalPixel.Luminance(),originalPixel.Luminance(), originalPixel.Luminance());
             GetPixel(x, y) = PixelLerp(grayPixel, originalPixel, factor);
         }
     }
@@ -414,8 +411,6 @@ void Image::EdgeDetect() {
     // Brighten and Scale Down - Up to catch darker and larger edges.
     thisImage->Brighten(0.50);
     thisImage->SetSamplingMethod(IMAGE_SAMPLING_GAUSSIAN);
-    thisImage = thisImage->Scale(0.5, 0.5);
-    thisImage = thisImage->Scale(2, 2);
     for (int x = 0; x < Width(); x++) {
         for (int y = 0; y < Height(); y++) {
             int xValue = 0, yValue = 0;
@@ -423,9 +418,7 @@ void Image::EdgeDetect() {
                 // convolve
                 for (int i = -1; i < 2; i++) {
                     for (int j = -1; j < 2; j++) {
-                        int grayscaleValue = (thisImage->GetPixel(x + i, y + j).r +
-                                              thisImage->GetPixel(x + i, y + j).g +
-                                              thisImage->GetPixel(x + i, y + j).b) / 3;
+                        auto grayscaleValue = thisImage->GetPixel(x + i, y + j).Luminance();
                         xValue += grayscaleValue * SobelHorizontalMask[1 + i][1 + j];
                         yValue += grayscaleValue * SobelVerticalMask[1 + i][1 + j];
                     }

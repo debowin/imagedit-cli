@@ -53,62 +53,62 @@ void Pixel::SetClamp (double r_, double g_, double b_, double a_)
 Pixel PixelRandom(void)
 {
     return Pixel(
-            ComponentRandom(),
-            ComponentRandom(),
-            ComponentRandom(),
-            ComponentRandom());
+        ComponentRandom(),
+        ComponentRandom(),
+        ComponentRandom(),
+        ComponentRandom());
 }
 
 
 Pixel operator+ (const Pixel& p, const Pixel& q)
 {
     return Pixel(
-            ComponentClamp(p.r + q.r),
-            ComponentClamp(p.g + q.g),
-            ComponentClamp(p.b + q.b),
-            ComponentClamp(p.a + q.a));
+        ComponentClamp(p.r + q.r),
+        ComponentClamp(p.g + q.g),
+        ComponentClamp(p.b + q.b),
+        ComponentClamp(p.a + q.a));
 }
 
 
 Pixel operator* (const Pixel& p, const Pixel& q)
 {
     return Pixel(
-            ComponentClamp(p.r * q.r),
-            ComponentClamp(p.g * q.g),
-            ComponentClamp(p.b * q.b),
-            ComponentClamp(p.a * q.a));
+        ComponentClamp(p.r * q.r),
+        ComponentClamp(p.g * q.g),
+        ComponentClamp(p.b * q.b),
+        ComponentClamp(p.a * q.a));
 }
 
 
 Pixel operator* (const Pixel& p, double f)
 {
     return Pixel(
-            ComponentScale(p.r, f),
-            ComponentScale(p.g, f),
-            ComponentScale(p.b, f),
-            ComponentScale(p.a, f));
+        ComponentScale(p.r, f),
+        ComponentScale(p.g, f),
+        ComponentScale(p.b, f),
+        ComponentScale(p.a, f));
 }
 
 
 Pixel PixelLerp (const Pixel& p, const Pixel& q, double t)
 {
     return Pixel(
-            ComponentLerp(p.r, q.r, t),
-            ComponentLerp(p.g, q.g, t),
-            ComponentLerp(p.b, q.b, t),
-            ComponentLerp(p.a, q.a, t));
+        ComponentLerp(p.r, q.r, t),
+        ComponentLerp(p.g, q.g, t),
+        ComponentLerp(p.b, q.b, t),
+        ComponentLerp(p.a, q.a, t));
 }
 
 Pixel PixelQuant( const Pixel &p, int nbits)
 {
-    int shift = 8-nbits;
-    float mult = 255/float(255 >> shift);
-    int new_r, new_g, new_b;
-    new_r = (p.r >> shift);
-    new_g = (p.g >> shift);
-    new_b = (p.b >> shift);
+	int shift = 8-nbits;
+	float mult = 255/float(255 >> shift);
+	int new_r, new_g, new_b;
+	new_r = (p.r >> shift);
+	new_g = (p.g >> shift);
+	new_b = (p.b >> shift);
 
-    Pixel ret;
-    ret.SetClamp(new_r*mult , new_g*mult , new_b*mult );
-    return ret;
+	Pixel ret;
+	ret.SetClamp(new_r*mult , new_g*mult , new_b*mult );
+	return ret;
 }
